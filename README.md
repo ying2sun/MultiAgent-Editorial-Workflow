@@ -21,11 +21,10 @@ The workflow orchestrates four distinct agents with isolated responsibilities to
 
 ## How to Run Locally
 
-To run this system on your local machine, you must provide your own API keys.
+This application is designed to be secure. It does not hardcode or store API keys. To run this system, you must provide your own API keys at runtime.
 
 1. Clone the repository.
 2. Create a virtual environment and install the dependencies: `pip install -r requirements.txt`
-3. Create a `.env` file in the root directory with the following keys:
-   OPENROUTER_API_KEY=your_key_here
-   NEWSDATA_API_KEY=your_key_here
-4. Launch the interface: `streamlit run app.py`
+3. Launch the interface: `streamlit run app.py`
+4. In the Streamlit web interface, use the sidebar to input your OpenRouter API Key and NewsData API Key.
+5. Enter your search keywords and click "Generate Verified Article".
