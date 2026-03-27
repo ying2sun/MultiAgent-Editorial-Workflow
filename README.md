@@ -1,7 +1,6 @@
 # Multi-Agent Editorial & Fact-Verification Loop
 
-**Live Demo:** [Click here to test the Streamlit web app](https://your-streamlit-app-url-here.share.streamlit.io](https://multiagent-editorial-workflow-nx4legyb4hpt8x8ifpuy7s.streamlit.app/) 
-*(Note: Requires your own OpenRouter and NewsData API keys to run).*
+**Live Demo:** [Click here to test the Streamlit web app](https://your-streamlit-app-url-here.share.streamlit.io) *(Note: Requires your own OpenRouter and NewsData API keys to run).*
 
 This repository contains a stateful, multi-agent AI architecture designed to automate the research, drafting, and rigorous fact-checking of global news. Built with LangGraph, it addresses the critical issue of Large Language Model (LLM) hallucinations in journalistic and content generation workflows.
 
