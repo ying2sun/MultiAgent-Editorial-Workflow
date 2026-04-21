@@ -1,6 +1,6 @@
 # Multi-Agent Editorial & Fact-Verification Loop
 
-**Live Demo:** [Click here to test the Streamlit web app](https://multiagent-editorial-workflow-nx4legyb4hpt8x8ifpuy7s.streamlit.app) *(Requires your own OpenRouter and NewsData API keys.)*
+**Live Demo:** [Click here to test the Streamlit web app](https://huggingface.co/spaces/ying2sun/MultiAgent-Editorial-Workflow) *(Requires your own OpenRouter and NewsData API keys.)*
 
 A stateful, independent open-source multi-agent AI system that autonomously researches, drafts, fact-checks, and GEO-optimizes news articles, with a built-in hallucination correction loop. Built with LangGraph and deployed on Streamlit.
 
