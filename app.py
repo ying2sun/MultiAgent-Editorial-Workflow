@@ -1,3 +1,4 @@
+import asyncio
 import streamlit as st
 from workflow import app as agent_workflow
 
@@ -40,7 +41,7 @@ if st.button("Generate Verified Article"):
             st.write("Agent A: Fetching live API data and compiling Fact Dossier...")
             
             try:
-                final_state = agent_workflow.invoke(initial_state)
+                final_state = asyncio.run(agent_workflow.ainvoke(initial_state))
                 
                 st.write("Agent B: Drafting journalistic narrative...")
                 st.write(f"Agent C: Fact-checking draft against dossier... Verified: {final_state.get('is_verified')}")

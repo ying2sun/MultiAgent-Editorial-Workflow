@@ -2,6 +2,9 @@ streamlit
 langgraph
 langchain
 langchain-openai
+langchain-mcp-adapters
 pydantic
 requests
+httpx
 python-dotenv
+mcp

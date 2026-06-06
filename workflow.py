@@ -1,9 +1,12 @@
+import os
+import asyncio
 import requests
 from typing import TypedDict
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.graph import StateGraph, END
+from langchain_mcp_adapters.client import MultiServerMCPClient
 
 # --- 1. The Shared Clipboard (State) ---
 # We added two new slots for the user's API keys
@@ -24,57 +27,46 @@ class FactCheckResult(BaseModel):
     feedback: str = Field(description="If False, provide specific instructions on what to fix. If True, output 'Approved'.")
 
 # --- 3. Agent A: The API Researcher ---
-def researcher_agent(state: EditorialState):
-    print("\n[Agent A] Searching the web and extracting facts and URLs...")
+async def researcher_agent(state: EditorialState):
+    print("\n[Agent A] Fetching live news via MCP server...")
     topic = state.get("search_topic")
     newsdata_key = state.get("newsdata_key")
     openrouter_key = state.get("openrouter_key")
-    
-    # Initialize the AI Brain using the user's provided key
+
     llm = ChatOpenAI(base_url="https://openrouter.ai/api/v1", api_key=openrouter_key, model="google/gemini-2.5-flash", temperature=0.0)
 
-    url = "https://newsdata.io/api/1/news"
-    params = {
-        "apikey": newsdata_key,
-        "q": topic,
-        "language": "en"
+    # Inject the NewsData key into the subprocess environment
+    # os.environ["NEWSDATA_KEY"] = newsdata_key
+
+    server_config = {
+        "news": {
+            "command": "python",
+            "args": ["mcp_news_server.py", newsdata_key],
+            "transport": "stdio",
+        }
     }
-    
+
     try:
-        api_response = requests.get(url, params=params)
-        api_response.raise_for_status()
-        json_data = api_response.json()
-        
-        articles = json_data.get("results", [])[:5]
-        
-        if not articles:
-            raw_search_results = "No recent news articles found for this topic."
-            formatted_urls = "No sources found."
-        else:
-            extracted_info = []
-            source_links = []
-            
-            for article in articles:
-                title = article.get("title", "No Title")
-                description = article.get("description", "No Description")
-                link = article.get("link", "#")
-                
-                extracted_info.append(f"- Title: {title}\n  Summary: {description}")
-                if link != "#":
-                    source_links.append(f"* [{title}]({link})")
-                    
-            raw_search_results = "\n\n".join(extracted_info)
-            formatted_urls = "\n".join(source_links)
-            
+        client = MultiServerMCPClient(server_config)
+        tools = await client.get_tools()
+        fetch_news_tool = next(t for t in tools if t.name == "fetch_news")
+        raw_result = await fetch_news_tool.ainvoke({"query": topic, "language": "en"})
     except Exception as e:
-        raw_search_results = f"API Request failed: {e}"
-        formatted_urls = "Error fetching sources."
+        print(f"DEBUG MCP ERROR: {e}")
+        raw_result = f"MCP fetch failed: {e}===SOURCES===Error fetching sources."
+
+    # Split on the delimiter to separate article facts from source URLs
+    if "===SOURCES===" in raw_result:
+        raw_articles, formatted_urls = raw_result.split("===SOURCES===", 1)
+    else:
+        raw_articles = raw_result
+        formatted_urls = "No sources found."
 
     system_instruction = SystemMessage(content="You are an expert Data Extraction Researcher. Extract a clean, bulleted 'Fact Dossier' containing only names, dates, quotes, and statistics. Do not write an article.")
-    user_prompt = HumanMessage(content=f"Raw API data:\n{raw_search_results}")
-    
-    response = llm.invoke([system_instruction, user_prompt])
-    
+    user_prompt = HumanMessage(content=f"Raw API data:\n{raw_articles}")
+
+    response = await llm.ainvoke([system_instruction, user_prompt])
+
     return {"raw_data": response.content, "feedback": "", "source_urls": formatted_urls}
 
 # --- 4. Agent B: The Journalist ---
@@ -173,7 +165,7 @@ def run_workflow():
     }
     
     print("\nStarting the Workflow...")
-    final_state = app.invoke(initial_state)
+    final_state = asyncio.run(app.ainvoke(initial_state))
 
     print("\n=========================================")
     print("          FINAL GEO-OPTIMIZED ARTICLE      ")
