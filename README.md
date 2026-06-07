@@ -57,7 +57,7 @@ Transforms the verified draft into a GEO-formatted article: structured markdown 
 
 Agent A's data retrieval is implemented as a standalone **Model Context Protocol (MCP) server** (`mcp_news_server.py`). Rather than calling the NewsData.io REST API directly inside the LangGraph agent function, the workflow spawns the MCP server as a subprocess and communicates with it over stdio via `langchain-mcp-adapters`.
 
-The MCP server exposes a single `fetch_news` tool endpoint. The LangGraph agent calls this tool through the standardized MCP protocol rather than a hardcoded API call. This decouples the data source from the orchestration layer: the news API can be swapped for any other source — a database, a web scraper, a different feed — without modifying the agent or graph logic.
+The MCP server exposes a single `fetch_news` tool endpoint. The LangGraph agent calls this tool through the standardized MCP protocol rather than a hardcoded API call. This decouples the data source from the orchestration layer: the news API can be swapped for any other source whatever a database, a web scraper, a different feed without modifying the agent or graph logic.
 
 ```
 User Keywords
