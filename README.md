@@ -25,7 +25,7 @@ The workflow enforces the **Single Responsibility Principle** across four isolat
 ### Agent Responsibilities
 
 **Agent A: API Researcher**
-Invokes a standalone MCP (Model Context Protocol) server (`mcp_news_server.py`) via stdio transport to retrieve live, grounded news data from NewsData.io. The MCP server exposes the API call as a standardized tool endpoint, decoupling the data source from the orchestration layer. Extracts a structured "Fact Dossier" — a set of verifiable claims and source URLs — that constrains all downstream agents.
+Invokes a standalone MCP (Model Context Protocol) server (`mcp_news_server.py`) via stdio transport to retrieve live, grounded news data from NewsData.io. The MCP server exposes the API call as a standardized tool endpoint, decoupling the data source from the orchestration layer. Extracts a structured "Fact Dossier" which is a set of verifiable claims and source URLs that constrains all downstream agents.
 
 **Agent B: Journalist**
 Drafts a narrative article strictly from the facts in the Dossier. Has no access to external knowledge, preventing confabulation at the drafting stage.
